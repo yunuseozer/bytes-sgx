@@ -1,6 +1,6 @@
 use {Buf, BufMut};
 use buf::IntoIter;
-use iovec::{IoVec, IoVecMut};
+use std::io::{IoSlice, IoSliceMut};
 
 /// A `Chain` sequences two buffers.
 ///
@@ -178,7 +178,7 @@ impl<T, U> Buf for Chain<T, U>
         self.b.advance(cnt);
     }
 
-    fn bytes_vec<'a>(&'a self, dst: &mut [IoVec<'a>]) -> usize {
+    fn bytes_vec<'a>(&'a self, dst: &mut [IoSlice<'a>]) -> usize {
         let mut n = self.a.bytes_vec(dst);
         n += self.b.bytes_vec(&mut dst[n..]);
         n
@@ -219,7 +219,7 @@ impl<T, U> BufMut for Chain<T, U>
         self.b.advance_mut(cnt);
     }
 
-    unsafe fn bytes_vec_mut<'a>(&'a mut self, dst: &mut [IoVecMut<'a>]) -> usize {
+    unsafe fn bytes_vec_mut<'a>(&'a mut self, dst: &mut [IoSliceMut<'a>]) -> usize {
         let mut n = self.a.bytes_vec_mut(dst);
         n += self.b.bytes_vec_mut(&mut dst[n..]);
         n

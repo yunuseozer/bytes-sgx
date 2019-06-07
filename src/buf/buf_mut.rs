@@ -1,8 +1,7 @@
 use super::{IntoBuf, Writer};
 use byteorder::{LittleEndian, ByteOrder, BigEndian};
-use iovec::IoVecMut;
 
-use std::{cmp, ptr, usize};
+use std::{cmp, io::IoSliceMut, ptr, usize};
 
 /// A trait for values that provide sequential write access to bytes.
 ///
@@ -164,7 +163,7 @@ pub trait BufMut {
     ///
     /// If the `BufMut` is backed by disjoint slices of bytes, `bytes_vec_mut`
     /// enables fetching more than one slice at once. `dst` is a slice of
-    /// mutable `IoVec` references, enabling the slice to be directly used with
+    /// mutable `IoSliceMut` references, enabling the slice to be directly used with
     /// [`readv`] without any further conversion. The sum of the lengths of all
     /// the buffers in `dst` will be less than or equal to
     /// `Buf::remaining_mut()`.
@@ -187,13 +186,13 @@ pub trait BufMut {
     /// with `dst` being a zero length slice.
     ///
     /// [`readv`]: http://man7.org/linux/man-pages/man2/readv.2.html
-    unsafe fn bytes_vec_mut<'a>(&'a mut self, dst: &mut [IoVecMut<'a>]) -> usize {
+    unsafe fn bytes_vec_mut<'a>(&'a mut self, dst: &mut [IoSliceMut<'a>]) -> usize {
         if dst.is_empty() {
             return 0;
         }
 
         if self.has_remaining_mut() {
-            dst[0] = self.bytes_mut().into();
+            dst[0] = IoSliceMut::new(self.bytes_mut());
             1
         } else {
             0
@@ -989,7 +988,7 @@ impl<'a, T: BufMut + ?Sized> BufMut for &'a mut T {
         (**self).bytes_mut()
     }
 
-    unsafe fn bytes_vec_mut<'b>(&'b mut self, dst: &mut [IoVecMut<'b>]) -> usize {
+    unsafe fn bytes_vec_mut<'b>(&'b mut self, dst: &mut [IoSliceMut<'b>]) -> usize {
         (**self).bytes_vec_mut(dst)
     }
 
@@ -1007,7 +1006,7 @@ impl<T: BufMut + ?Sized> BufMut for Box<T> {
         (**self).bytes_mut()
     }
 
-    unsafe fn bytes_vec_mut<'b>(&'b mut self, dst: &mut [IoVecMut<'b>]) -> usize {
+    unsafe fn bytes_vec_mut<'b>(&'b mut self, dst: &mut [IoSliceMut<'b>]) -> usize {
         (**self).bytes_vec_mut(dst)
     }
 
