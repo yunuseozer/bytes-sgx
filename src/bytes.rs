@@ -1,3 +1,4 @@
+use std::prelude::v1::*;
 use {Buf, BufMut, IntoBuf};
 use buf::IntoIter;
 use debug;

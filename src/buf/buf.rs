@@ -1,3 +1,4 @@
+use std::prelude::v1::*;
 use super::{IntoBuf, Take, Reader, FromBuf, Chain};
 use byteorder::{BigEndian, ByteOrder, LittleEndian};
 use iovec::IoVec;
