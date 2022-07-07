@@ -43,4 +43,4 @@ mesalock_sgx = ["std", "sgx_tstd"]
 
 [dependencies]
 serde = { git = "https://github.com/yunuseozer/serde-sgx", optional = true }
-sgx_tstd = {  rev = "v1.1.4-upgrade", git = "https://github.com/yunuseozer/incubator-teaclave-sgx-sdk.git" }
+sgx_tstd = {  rev = "v1.1.4-upgrade", git = "https://github.com/yunuseozer/incubator-teaclave-sgx-sdk.git", optional = true }
